@@ -99,12 +99,12 @@ return;
 
 // AI pick next move
 void computerTurn(char** board, int size, bool** visited) {
-	int hCount, vCount, negDCount, posDCount = 0;
+	int hCount = 0; int vCount = 0; int negDCount = 0; int posDCount = 0;
 	int *hCountTemp = (int *)1;
 	int *vCountTemp = (int *)1;
 	int *negDCountTemp = (int *)1;
 	int *posDCountTemp = (int *)1;
-	int hIndex, vIndex, negDIndex, posDIndex = 0;
+	int hIndex = 0; int vIndex = 0; int negDIndex = 0; int posDIndex = 0;
 	int *hIndexTemp = (int *)0;
 	int *vIndexTemp = (int *)0;
 	int *negDIndexTemp = (int *)0;
