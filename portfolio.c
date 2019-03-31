@@ -18,15 +18,15 @@ int isSafe(char** board, int size, int row, int col, bool** visited) {
 // function that does a DFS on a 2D boolean matrix, counts the two horizonal neighbors as adjacent vertices
 // adapted from geeksforgeeks, see README
 void horizDFS(char** board, int size, int *hCount, int *hIndex, int row, int col, bool** visited) {
-	int rowNum[] = {0, 0};					// these arrays are used to get coordinates of horizontal neighbors
+	int rowNum[] = {0, 0};					// arrays used to get coordinates of horizontal neighbors
 	int colNum[] = {-1, 1};
 
 	visited[row][col] = true;				// marks current cell as visited
 
 	for (int k=0; k<2; k++) {
 		if (isSafe(board, size, row+rowNum[k], col+colNum[k], visited)) {
-			hCount++;
-			if (k==0)
+			hCount++;				
+			if (k==0)				// increasing count in-a-row and moving index of last spot
 				hIndex--;
 			else if (k==1)
 				hIndex++;
@@ -40,10 +40,10 @@ return;
 // function that does a DFS on a 2D boolean matrix, counts the two vertical neighbors as adjacent vertices
 // adapted from geeksforgeeks, see README
 void vertDFS(char** board, int size, int *vCount, int *vIndex, int row, int col, bool** visited) {
-	int rowNum[] = {-1, 1};
+	int rowNum[] = {-1, 1};					
 	int colNum[] = {0, 0};
 
-	visited[row][col] = true;
+	visited[row][col] = true;				
 
 	for (int k=0; k<2; k++) {
 		if (isSafe(board, size, row+rowNum[k], col+colNum[k], visited)) {
@@ -110,7 +110,7 @@ void computerTurn(char** board, int size, bool** visited) {
 	int *negDIndexTemp = (int *)0;
 	int *posDIndexTemp = (int *)0;
 
-	// FIXME: want to use DFS functions to find largest current streak and add next marker to next column/row
+	// use DFS functions to find largest current streak and add next marker to next column/row
 	for (int i=size-1; i>=0; i--) {
 		for (int j=0; j<size; j++) {
 			if (board[i][j] == 'O') {
@@ -209,7 +209,7 @@ void computerTurn(char** board, int size, bool** visited) {
 	}
 }
 
-// print board
+// function that prints the board
 void printBoard(char** board, int size) {
 	for (int i=0; i<size; i++) {
 		for (int j=0; j<size; j++) {
@@ -253,8 +253,7 @@ int checkFour(char** board, int a, int aa, int b, int bb, int c, int cc, int d, 
 // function to check for four in a row horizontally
 int checkHoriz(char** board, int size) {
 	int row, col;
-//FIXME: maybe check bottom up
-	for (row = 0; row < size; row++) {
+	for (row = size-1; row >= 0; row--) {
 		for (col = 0; col < size-3; col++) {
 			if (checkFour(board, row, col, row, col+1, row, col+2, row, col+3)) {
 				return 1;
@@ -268,8 +267,7 @@ int checkHoriz(char** board, int size) {
 // function to check for four in a row vertically
 int checkVert(char** board, int size) {
 	int row, col;
-//FIXME: maybe check bottom up
-	for (row = 0; row < size-3; row++) {
+	for (row = size-4; row >= 0; row--) {
 		for (col = 0; col < size; col++) {
 			if (checkFour(board, row, col, row+1, col, row+2, col, row+3, col)) {
 				return 1;
@@ -283,7 +281,6 @@ int checkVert(char** board, int size) {
 // function to check for four in a row diagonally
 int checkDiag(char** board, int size) {
 	int row, col;
-//FIXME: maybe check bottom up
 	for (row = 0; row < size-3; row++) {
 		for (col = 0; col < size-3; col++) {
 			if (checkFour(board, row, col, row+1, col+1, row+2, col+2, row+3, col+3)) {
@@ -316,8 +313,11 @@ int main(void) {
 	int turn = 0;
 	int boardSize;
 	bool done = false;
+	int playerOneScore = 0;
+	int playerTwoScore = 0;
+	bool playAgain = true;
 
-// Prompt user and set board size.
+// Prompt user for board size and set board size.
 
 	printf("Enter the game board size you would like to play on. You only need to enter one dimension, this is a square board.\n");
 	printf("Note that if you choose to use a board of excessive size (40x40 or more), your screen may not handle it well.\n");
@@ -351,103 +351,130 @@ int main(void) {
 		scanf("%d", &numPlayers);
 	}
 
-// 1-player game
-	if (numPlayers == 1) {
-		printf("You have chosen to play against the computer.\n");
-		printf("Your filled spots will be marked with an 'X' and the computer's spots will be marked with an 'O'.\n");
+	while (playAgain == true) {
+	// 1-player game
+		if (numPlayers == 1) {
+			printf("You have chosen to play against the computer.\n");
+			printf("Your filled spots will be marked with an 'X' and the computer's spots will be marked with an 'O'.\n");
 
-	// create matrix to mark visited cells
-		bool **visited;
-		visited = malloc(boardSize * sizeof *visited);
-		for (int a=0; a<boardSize; a++) {
-			visited[a] = malloc(boardSize * sizeof *visited[a]);
-		}
-/*		for (int i=0; i<boardSize; i++) {
-			for (int j=0; j<boardSize; j++) {	FIXME: currently commented out first initialization. do i need it?
-				visited[i][j] = false;
+		// create matrix to mark visited cells
+			bool **visited;
+			visited = malloc(boardSize * sizeof *visited);
+			for (int a=0; a<boardSize; a++) {
+				visited[a] = malloc(boardSize * sizeof *visited[a]);
 			}
-		}
-*/
-	// actual play
-		for (turn=0; turn < boardSize*boardSize && !done; turn++) {
+
+		// actual play
+			for (turn=0; turn < boardSize*boardSize && !done; turn++) {
+				printBoard(board, boardSize);
+	
+				if (turn%2 == 0) {						// human turn
+					while(!takeTurn(board, boardSize, 0, PIECES)) {
+						printBoard(board, boardSize);
+						printf("**Column full!** Try a different column.	");
+					}
+					done = checkWin(board, boardSize);
+				}
+
+				else if (turn%2 == 1) {						// computer turn
+					// every turn: reset visited matrix, then call AI turn function, then check if done
+
+					printf("\nComputer's turn: \n");		
+
+					for (int i=0; i<boardSize; i++) {
+						for (int j=0; j<boardSize; j++) {
+							visited[i][j] = false;
+						}
+					}
+							
+					if (turn == 1) {
+						if (board[boardSize-1][0] == '_')
+							board[boardSize-1][0] = 'O';
+						else
+							board[boardSize-1][1] = 'O';
+					}					
+		
+					else {
+						computerTurn(board, boardSize, visited);
+					}
+			
+					done = checkWin(board, boardSize);
+				}
+			}
 			printBoard(board, boardSize);
 	
-			if (turn%2 == 0) {						// human turn
-				while(!takeTurn(board, boardSize, 0, PIECES)) {
+			if (turn == boardSize*boardSize && !done) {
+				printf("It's a tie!\n");
+			}
+			else {
+				if (turn%2 == 1) {
+					printf("\nYou win!\n");
+					playerOneScore++;
+				}
+				else {
+					printf("\nThe computer wins!\n");
+					playerTwoScore++;
+				}
+			}
+			
+			printf("\nScore --- You: %d        Computer: %d \n", playerOneScore, playerTwoScore);
+		}
+
+	// 2-player game
+		if (numPlayers == 2) {
+			printf("You have chosen to play against a human.\n");
+			printf("Player 1's spots will be marked with an 'X' and Player 2's spots will be marked with an 'O'.\n");
+
+			for (turn=0; turn < boardSize*boardSize && !done; turn++) {
+				printBoard(board, boardSize);
+				while(!takeTurn(board, boardSize, turn%2, PIECES)) {		// takeTurn returns 0 if column is full
 					printBoard(board, boardSize);
 					printf("**Column full!** Try a different column.	");
 				}
 				done = checkWin(board, boardSize);
 			}
-
-			else if (turn%2 == 1) {						// computer turn
-				// FIXME : computer turn
-				// every turn: reset visited matrix, then call AI turn function, then check if done
-
-				printf("\nComputer's turn: \n");		
-
-				for (int i=0; i<boardSize; i++) {
-					for (int j=0; j<boardSize; j++) {
-						visited[i][j] = false;
-					}
-				}
-							
-				if (turn == 1) {
-					if (board[boardSize-1][0] == '_')
-						board[boardSize-1][0] = 'O';
-					else
-						board[boardSize-1][1] = 'O';
-				}					
-		
-				else {
-					computerTurn(board, boardSize, visited);
-				}
-			
-				done = checkWin(board, boardSize);
-			}
-		}
-		printBoard(board, boardSize);
-	
-		if (turn == boardSize*boardSize && !done) {
-			printf("It's a tie!\n");
-		}
-		else {
-			if (turn%2 == 1)
-				printf("You win!\n");
-			else
-				printf("The computer wins!\n");
-		}
-	}
-
-// 2-player game
-	if (numPlayers == 2) {
-		printf("You have chosen to play against a human.\n");
-		printf("Player 1's filled spots will be marked with an 'X' and Player 2's spots will be marked with an 'O'.\n");
-
-		for (turn=0; turn < boardSize*boardSize && !done; turn++) {
 			printBoard(board, boardSize);
-			while(!takeTurn(board, boardSize, turn%2, PIECES)) {		// takeTurn returns 0 if column is full
-				printBoard(board, boardSize);
-				printf("**Column full!** Try a different column.	");
-			}
-			done = checkWin(board, boardSize);
-		}
-		printBoard(board, boardSize);
 
-		if (turn == boardSize*boardSize && !done) {
-			printf("It's a tie!\n");
+			if (turn == boardSize*boardSize && !done) {
+				printf("It's a tie!\n");
+			}
+			else {
+				turn--;
+				printf("\nPlayer %d wins!\n", turn%2 + 1);
+				
+				if (turn%2 == 0)
+					playerOneScore++;
+				else if (turn%2 == 1)
+					playerTwoScore++;
+			}
+
+			printf("\nScore --- Player 1: %d        Player 2: %d \n", playerOneScore, playerTwoScore);
 		}
-		else {
-			turn--;
-			printf("Player %d wins!\n", turn%2 + 1);
+	
+		for (int i=0; i<boardSize; i++) {					// reset the board
+			for (int j=0; j<boardSize; j++) {
+				board[i][j] = '_';
+			}
 		}
+	
+		printf("\nPlay again? Yes(Y) or No(N):	");
+		char yesNo;
+		scanf("%s", &yesNo);
+		while ((yesNo != 'Y') && (yesNo != 'N') && (yesNo != 'y') && (yesNo != 'n')) {
+			printf("\nPlease input a 'Y' or 'N' to choose whether you want to play again:	");
+			scanf("%s", &yesNo);
+		}
+
+		if ((yesNo == 'Y') || (yesNo == 'y')) {
+			playAgain = true;
+		}
+		else if ((yesNo == 'N') || (yesNo == 'n')) {
+			playAgain = false;
+		}
+		
 	}
 
 
-// FIXME: let user play again and keep score
-
-
-
-	return 0;
+return 0;
 
 }
