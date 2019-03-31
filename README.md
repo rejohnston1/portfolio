@@ -9,7 +9,8 @@ Then, it will print the board and begin play. Each turn, the program will prompt
 As soon as the winning marker is placed, the program will end the game, declare the winner, display the total score, and ask you if you want to play again.
 
 
-Source Code
+Source Code:
+
 In my isSafe, horizDFS, vertDFS, negDiagDFS, and posDiagDFS functions, I note that they are adapted from a program on geeksforgeeks.com. The program on geeksforgeeks is for finding and counting "islands" in a 2D matrix. https://www.geeksforgeeks.org/find-number-of-islands/
 I adapted its DFS recursion function and use of a "visited" matrix to form my DFS functions that I used in my main AI function.
 
