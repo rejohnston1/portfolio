@@ -224,21 +224,22 @@ return;
 }
 
 // function that prompts user to take their turn and inserts markers into their chosen column
+// adapted from stackexchange, see README
 int takeTurn(char** board, int size, int player, const char *PIECES) {
 	int row, col = 0;
-	printf("\nPlayer %d, Enter column you want to place your marker in:	", player + 1);
+	printf("\nPlayer %d, Enter the column you want to place your marker in:     ", player + 1);
 	scanf("%d", &col);
 	
 	while (col < 1 || col > size) {
-		printf("Number out of bounds! Try again.	");
+		printf("Number out of bounds. Try again.	");
 		scanf("%d", &col);
 	}
 		
-	col--;						//adjust column number to 0-based matrix
+	col--;								//adjust column number to 0-based matrix
 
-	for (row = size - 1; row >= 0; row--) {		//checks column for filled spots from the bottom up
+	for (row = size - 1; row >= 0; row--) {				//checks column for filled spots from the bottom up
 		if (board[row][col] == '_') {
-			board[row][col] = PIECES[player];	// inserts player's piece in column
+			board[row][col] = PIECES[player];		// inserts player's piece in column
 			return 1;
 		}
 	}
@@ -371,7 +372,7 @@ int main(void) {
 				if (turn%2 == 0) {						// human turn
 					while(!takeTurn(board, boardSize, 0, PIECES)) {
 						printBoard(board, boardSize);
-						printf("**Column full!** Try a different column.	");
+						printf("Column full. Please try a different column.	");
 					}
 					done = checkWin(board, boardSize);
 				}
@@ -429,7 +430,7 @@ int main(void) {
 				printBoard(board, boardSize);
 				while(!takeTurn(board, boardSize, turn%2, PIECES)) {		// takeTurn returns 0 if column is full
 					printBoard(board, boardSize);
-					printf("**Column full!** Try a different column.	");
+					printf("Column full. Please try a different column.	");
 				}
 				done = checkWin(board, boardSize);
 			}
